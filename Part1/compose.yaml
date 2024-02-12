@@ -1,5 +1,5 @@
 services:
   web:
-    image : dius-regression-checkpoint
+    image : dius-regression
     ports:
       - "8178:8178"

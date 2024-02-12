@@ -9,7 +9,7 @@ RMSE : 9.456 <br>
 
 ## Instructions
 1. Clone the repository to local machine
-2. Build Docker imagee using the command `docker build -t dius-regression`
+2. Build Docker image using the command `docker build -t dius-regression .`
 3. Once the process is completed, run the container using the following command <br>
 `docker-compose up`
 4. The service should be up and running at http://0.0.0.0:8178. Use POST calls to tes the service. A sample curl call is mentioned below - <br>

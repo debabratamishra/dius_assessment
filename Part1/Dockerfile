@@ -5,7 +5,7 @@ FROM tensorflow/tensorflow:latest
 WORKDIR /app
 
 # Copy the Python script containing your model code to the container
-COPY flask_script_checkpoint.py /app/flask_script_checkpoint.py
+COPY flask_serving.py /app/flask_serving.py
 COPY train.csv /app/train.csv
 # Copying model checkpoints
 COPY model_checkpoint.ckpt.data-00000-of-00001 /app/model_checkpoint.ckpt.data-00000-of-00001
@@ -19,4 +19,4 @@ RUN pip install -r requirements.txt --ignore-installed
 EXPOSE 8178
 
 # Set the command to run your script when the container starts
-CMD ["python", "/app/flask_script_checkpoint.py"]
+CMD ["python", "/app/flask_serving.py"]
