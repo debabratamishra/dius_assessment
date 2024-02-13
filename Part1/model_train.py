@@ -10,9 +10,10 @@ from tensorflow.keras.optimizers import SGD
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 
+#Setting seed to make deterministic network
 np.random.seed(42)
 tf.random.set_seed(42)
-tf.keras.utils.set_random_seed(42)  # sets seeds for base-python, numpy and tf
+tf.keras.utils.set_random_seed(42)
 tf.config.experimental.enable_op_determinism()
 
 # Load and preprocess data
