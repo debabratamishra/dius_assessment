@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 
 app = Flask(__name__)
 
-# Load the trained model
+# Defining model checkpoint filepath on disk
 model_checkpoint_filepath = 'model_checkpoint.ckpt'
 
 def model_init():
@@ -34,7 +34,7 @@ def model_init():
     return model
 
 
-# Preprocess the input data
+# Function for preprocessing the data received from user
 def preprocess_data(data):
     
     train_df = pd.read_csv("train.csv")
@@ -47,18 +47,8 @@ def preprocess_data(data):
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     
-    
-    # Transforming test dictionary received from user
-    encoding_dict = {
-        0: "ACV",
-        1: "AED",
-        2: "DAF",
-        3: "DEB",
-        4: "OIF",
-        5: "QWE"
-    }
-
-    # Get the value from dictionary_a["X10"]
+    # Transforming test dictionary received from user on the basis of encoding used druing training
+    encoding_dict = { 0: "ACV", 1: "AED", 2: "DAF", 3: "DEB", 4: "OIF", 5: "QWE"}
     value_X10 = data["X10"]
 
     # Find the corresponding encoding from encoding_dict
@@ -68,26 +58,27 @@ def preprocess_data(data):
             encoded_value = key
             break
 
-    # Update the value in dictionary_a["X10"] with its encoded value
     if encoded_value is not None:
         data["X10"] = encoded_value
     
-    # Extract values and convert them to float
+    # Extracting values and converting them to float
     values = [float(value) for value in data.values()]
 
-    # Convert to numpy array
+    # Converting to numpy array
     values_np_arr = np.array(values)
+    #Normalizing the predictors received in the request
     test_predictors_scaled = scaler.transform(values_np_arr.reshape(1, -1))
     test_predictors_reshaped = np.reshape(test_predictors_scaled, (1, 1, 10))
 
     return test_predictors_reshaped
 
-# Define a route for making predictions
+# Function for defining a route for making predictions
 @app.route('/predict', methods=['POST'])
 def predict():
-    # Get the input data from the request
+    # Getting the input data from the request
     data = request.get_json()
     try:
+        #Initializing the model
         model = model_init()
         model.load_weights(model_checkpoint_filepath)
         print("Model loaded successfully.")
@@ -97,18 +88,19 @@ def predict():
         return {"prediction" : "Checkpointed model not found"}
     
     try:
-        # Preprocess the input data
+        # Preprocessing the input data
         transformed_data = preprocess_data(data)
 
-        # Make predictions using the loaded model
+        # Making predictions using the loaded model
         predictions = model.predict(transformed_data)
         pred_val = float(predictions[0][0])
         return {"prediction" : pred_val}
     except Exception as e:
+        #Handling invalid request
         print(e)
         return {"prediction" : "Invalid data passed"}
     
 
 if __name__ == '__main__':
+    #Defining host and port for the application
     app.run(host='0.0.0.0', port=8178)
-    # curl --json '{"X1": "14.59355382431799","X2": "41.18622465124143","X3": "33.9978936605386","X4": "64.4769023500858","X5": "108.81641054516794","X6" : "79.18062928342908", "X7" : "70.75284656795137", "X8" : "109.25455637899452", "X9" : "123.59616528814512", "X10" : "QWE"}' http://0.0.0.0:8178/predict
